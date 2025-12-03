@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout } from '../lib/auth'
 import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Navbar() {
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ export default function Navbar() {
 
   return (
     <header className="glass-panel sticky top-0 z-40 border-b-0 rounded-none">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
         <Link to="/" className="font-bold text-xl text-white flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary-DEFAULT flex items-center justify-center">
             <span className="text-white text-xs">🚀</span>
@@ -39,6 +40,9 @@ export default function Navbar() {
           {user ? (
             <>
               <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
+              {user.role === 'admin' && (
+                <NavLink to="/admin" className={linkClass}>Admin Panel</NavLink>
+              )}
               <button onClick={handleLogout} className="ml-2 btn-primary py-2 px-4 text-xs">Logout</button>
             </>
           ) : (
@@ -62,23 +66,34 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      {isMenuOpen && (
-        <div className="md:hidden glass-panel border-t border-white/10 absolute top-16 left-0 w-full p-4 flex flex-col gap-2 animate-in slide-in-from-top-5">
-          <NavLink to="/" className={mobileLinkClass} onClick={toggleMenu} end>Home</NavLink>
-          <NavLink to="/products" className={mobileLinkClass} onClick={toggleMenu}>Services</NavLink>
-          {user ? (
-            <>
-              <NavLink to="/dashboard" className={mobileLinkClass} onClick={toggleMenu}>Dashboard</NavLink>
-              <button onClick={() => { handleLogout(); toggleMenu(); }} className="mt-2 btn-primary w-full py-2">Logout</button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login" className={mobileLinkClass} onClick={toggleMenu}>Login</NavLink>
-              <NavLink to="/signup" className="mt-2 btn-primary w-full py-2 text-center" onClick={toggleMenu}>Sign up</NavLink>
-            </>
-          )}
-        </div>
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-16 left-0 w-full bg-black/95 backdrop-blur-xl border-b border-white/10 p-4 flex flex-col gap-2 shadow-2xl"
+          >
+            <NavLink to="/" className={mobileLinkClass} onClick={toggleMenu} end>Home</NavLink>
+            <NavLink to="/products" className={mobileLinkClass} onClick={toggleMenu}>Services</NavLink>
+            {user ? (
+              <>
+                <NavLink to="/dashboard" className={mobileLinkClass} onClick={toggleMenu}>Dashboard</NavLink>
+                {user.role === 'admin' && (
+                  <NavLink to="/admin" className={mobileLinkClass} onClick={toggleMenu}>Admin Panel</NavLink>
+                )}
+                <button onClick={() => { handleLogout(); toggleMenu(); }} className="mt-2 btn-primary w-full py-2">Logout</button>
+              </>
+            ) : (
+              <>
+                <NavLink to="/login" className={mobileLinkClass} onClick={toggleMenu}>Login</NavLink>
+                <NavLink to="/signup" className="mt-2 btn-primary w-full py-2 text-center" onClick={toggleMenu}>Sign up</NavLink>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

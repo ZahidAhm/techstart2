@@ -9,11 +9,16 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    login({ email })
-    const from = location.state?.from?.pathname || '/dashboard'
-    navigate(from, { replace: true })
+    try {
+      await login({ email, password })
+      const from = location.state?.from?.pathname || '/dashboard'
+      navigate(from, { replace: true })
+      window.location.reload()
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
   return (

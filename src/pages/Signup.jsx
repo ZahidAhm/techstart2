@@ -8,10 +8,15 @@ export default function Signup() {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    signup({ email })
-    navigate('/dashboard', { replace: true })
+    try {
+      await signup({ email, password })
+      navigate('/dashboard', { replace: true })
+      window.location.reload()
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
   return (
